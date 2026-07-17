@@ -4,6 +4,7 @@
     path: /etc/yum.repos.d/pgdg-redhat-all.repo
   register: pgdg_repo
   when: postgresql_use_pgdg
+  tags: install
 
 - name: Install PGDG repo RPM (RHEL 9 only)
   ansible.builtin.dnf:
@@ -13,6 +14,7 @@
   when:
     - postgresql_use_pgdg
     - not pgdg_repo.stat.exists
+  tags: install
 
 - name: Check postgresql AppStream module state (RHEL 9 only)
   ansible.builtin.command: dnf module list --enabled postgresql
@@ -22,6 +24,7 @@
   when:
     - postgresql_use_pgdg
     - not pgdg_repo.stat.exists
+  tags: install
 
 - name: Disable built-in postgresql AppStream module (RHEL 9 only)
   ansible.builtin.command: dnf -qy module disable postgresql
@@ -30,6 +33,7 @@
     - not pgdg_repo.stat.exists
     - "'postgresql' in pg_module_check.stdout | default('')"
   changed_when: true
+  tags: install
 
 - name: Install PostgreSQL from PGDG (RHEL 9)
   ansible.builtin.dnf:
@@ -39,6 +43,7 @@
       - python3-psycopg2
     state: present
   when: postgresql_use_pgdg
+  tags: install
 
 - name: Install PostgreSQL from native AppStream (RHEL 10+)
   ansible.builtin.dnf:
@@ -50,24 +55,28 @@
       - libpq
     state: present
   when: not postgresql_use_pgdg
+  tags: install
 
 - name: Initialize database
   ansible.builtin.command: "{{ postgresql_bin_dir }}/postgresql-setup --initdb"
   args:
     creates: "{{ postgresql_data_dir }}/PG_VERSION"
   when: not postgresql_use_pgdg
+  tags: install
 
 - name: Initialize database (PGDG naming, RHEL 9)
   ansible.builtin.command: "{{ postgresql_bin_dir }}/postgresql-{{ postgresql_version }}-setup initdb"
   args:
     creates: "{{ postgresql_data_dir }}/PG_VERSION"
   when: postgresql_use_pgdg
+  tags: install
 
 - name: Ensure PostgreSQL is running and enabled
   ansible.builtin.systemd:
     name: "{{ postgresql_service_name }}"
     state: started
     enabled: true
+  tags: install
 
 - name: Allow postgres through firewalld if remote access needed
   ansible.posix.firewalld:
@@ -76,3 +85,4 @@
     state: enabled
     immediate: true
   when: postgresql_listen_addresses != "localhost"
+  tags: install

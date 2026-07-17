@@ -6,9 +6,11 @@
       - python3-psycopg2
     state: present
     update_cache: true
+  tags: install
 
 - name: Ensure PostgreSQL is running and enabled
   ansible.builtin.systemd:
     name: "{{ postgresql_service_name }}"
     state: started
     enabled: true
+  tags: install
