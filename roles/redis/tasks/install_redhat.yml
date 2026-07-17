@@ -3,13 +3,17 @@
     name: epel-release
     state: present
   when: ansible_facts['distribution_major_version'] | int < 10
+  tags: install
 
 - name: Install redis/valkey package
   ansible.builtin.dnf:
     name: "{{ redis_package_name }}"
     state: present
+  tags: install
 
-- import_tasks: discover_conf_path_redhat.yml
+- name: Discover redis/valkey config path
+  ansible.builtin.include_tasks: discover_conf_path_redhat.yml
+  tags: install
 
 - name: Allow redis/valkey through firewalld if remote access needed
   ansible.posix.firewalld:
@@ -18,3 +22,4 @@
     state: enabled
     immediate: true
   when: redis_bind != "127.0.0.1"
+  tags: install
