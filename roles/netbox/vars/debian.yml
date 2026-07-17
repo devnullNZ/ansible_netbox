@@ -1,0 +1,12 @@
+---
+netbox_python_pkg: "python{{ netbox_python_version }}"
+netbox_python_venv_pkg: "python{{ netbox_python_version }}-venv"
+netbox_venv_python_bin: "python{{ netbox_python_version }}"
+netbox_build_deps:
+  - build-essential
+  - libxml2-dev
+  - libxslt1-dev
+  - libffi-dev
+  - libpq-dev
+  - libssl-dev
+  - zlib1g-dev

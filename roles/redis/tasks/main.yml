@@ -1,0 +1,14 @@
+---
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] | lower }}.yml"
+
+- name: Include uninstall tasks
+  ansible.builtin.include_tasks: uninstall.yml
+  tags: uninstall
+
+- name: Include OS-specific install tasks
+  ansible.builtin.include_tasks: "install_{{ ansible_facts['os_family'] | lower }}.yml"
+  tags: install
+
+- import_tasks: configure.yml
+  tags: install

@@ -1,0 +1,31 @@
+---
+- name: Enable CodeReady Builder repo
+  ansible.builtin.command: >
+    subscription-manager repos --enable
+    codeready-builder-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
+  changed_when: true
+
+- name: Install Python and build dependencies
+  ansible.builtin.dnf:
+    name: "{{ [netbox_python_pkg, netbox_python_pkg + '-devel', netbox_python_pkg + '-pip', 'git'] + netbox_build_deps }}"
+    state: present
+
+- name: Allow NetBox web port through firewalld
+  ansible.posix.firewalld:
+    port: "{{ netbox_web_port }}/tcp"
+    permanent: true
+    state: enabled
+    immediate: true
+
+- name: Set SELinux context for NetBox home
+  community.general.sefcontext:
+    target: "{{ netbox_home }}(/.*)?"
+    setype: httpd_sys_rw_content_t
+    state: present
+  notify: restore netbox selinux context
+
+- name: Allow httpd/proxy network connect (Caddy -> gunicorn over TCP)
+  ansible.posix.seboolean:
+    name: httpd_can_network_connect
+    state: true
+    persistent: true

@@ -1,0 +1,7 @@
+---
+postgresql_service_name: postgresql
+postgresql_data_dir: "/var/lib/postgresql/{{ postgresql_version }}/main"
+postgresql_conf_dir: "/etc/postgresql/{{ postgresql_version }}/main"
+postgresql_hba_path: "{{ postgresql_conf_dir }}/pg_hba.conf"
+postgresql_system_user: postgres
+postgresql_use_pgdg: false

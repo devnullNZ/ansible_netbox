@@ -1,0 +1,13 @@
+---
+# RHEL 9: use PGDG for a current, consistent version across Debian/RHEL.
+# RHEL 10: modularity is gone and the native AppStream postgresql-server
+# package is already current — no PGDG bootstrap needed, and no version
+# suffix in the package/service name.
+postgresql_use_pgdg: "{{ ansible_facts['distribution_major_version'] | int < 10 }}"
+
+postgresql_service_name: "{{ 'postgresql-' ~ postgresql_version if postgresql_use_pgdg else 'postgresql' }}"
+postgresql_data_dir: "{{ '/var/lib/pgsql/' ~ postgresql_version ~ '/data' if postgresql_use_pgdg else '/var/lib/pgsql/data' }}"
+postgresql_conf_dir: "{{ postgresql_data_dir }}"
+postgresql_hba_path: "{{ postgresql_conf_dir }}/pg_hba.conf"
+postgresql_bin_dir: "{{ '/usr/pgsql-' ~ postgresql_version ~ '/bin' if postgresql_use_pgdg else '/usr/bin' }}"
+postgresql_system_user: postgres

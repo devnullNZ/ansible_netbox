@@ -1,0 +1,8 @@
+---
+- name: restart postgresql
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: restarted
+
+- name: restore postgresql selinux context
+  ansible.builtin.command: "restorecon -Rv {{ postgresql_data_dir }}"

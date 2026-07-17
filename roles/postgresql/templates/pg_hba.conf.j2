@@ -1,0 +1,3 @@
+{% for entry in postgresql_hba_entries %}
+{{ entry.type }}\t{{ entry.database }}\t{{ entry.user }}\t{% if entry.address is defined %}{{ entry.address }}\t{% endif %}{{ entry.auth_method }}
+{% endfor %}

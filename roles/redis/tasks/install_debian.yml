@@ -1,0 +1,6 @@
+---
+- name: Install redis-server
+  ansible.builtin.apt:
+    name: "{{ redis_package_name }}"
+    state: present
+    update_cache: true

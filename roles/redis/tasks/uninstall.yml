@@ -1,0 +1,32 @@
+---
+- name: Stop and disable redis/valkey service
+  ansible.builtin.systemd:
+    name: "{{ redis_service_name }}"
+    state: stopped
+    enabled: false
+  failed_when: false
+  tags: uninstall
+
+- name: Remove redis/valkey package (Debian)
+  ansible.builtin.apt:
+    name: "{{ redis_package_name }}"
+    state: absent
+    purge: true
+  when: ansible_facts['os_family'] == "Debian"
+  tags: uninstall
+
+- name: Remove redis/valkey package (RHEL)
+  ansible.builtin.dnf:
+    name: "{{ redis_package_name }}"
+    state: absent
+  when: ansible_facts['os_family'] == "RedHat"
+  tags: uninstall
+
+- name: Remove redis/valkey config and data
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - "{{ redis_conf_path }}"
+    - "/var/lib/{{ redis_service_name }}"
+  tags: uninstall

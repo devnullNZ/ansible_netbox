@@ -1,0 +1,69 @@
+---
+netbox_version: "v4.1.7"
+netbox_git_url: https://github.com/netbox-community/netbox.git
+netbox_user: netbox
+netbox_group: netbox
+netbox_home: /opt/netbox
+netbox_venv: "{{ netbox_home }}/venv"
+netbox_python_version: "3.12"
+
+netbox_web_port: 8001
+
+netbox_superuser_username: admin
+netbox_superuser_password: "{{ vault_netbox_superuser_password }}"
+netbox_superuser_email: admin@gswsystems.com
+
+netbox_secret_key: "{{ vault_netbox_secret_key }}"
+
+# DB/Redis connection facts consumed by the postgresql/redis roles too —
+# keep these as the single source of truth referenced from both places.
+netbox_db_name: netbox
+netbox_db_user: netbox
+netbox_db_host: localhost
+netbox_db_port: 5432
+
+netbox_redis_host: localhost
+netbox_redis_port: 6379
+netbox_redis_tasks_db: 1
+netbox_redis_cache_db: 0
+
+# --- Plugins: name + pip source + desired state ---
+netbox_plugins: []
+# Example:
+# netbox_plugins:
+#   - name: netbox_ping
+#     pip: netbox-ping
+#     state: present
+
+# --- Dict-driven NetBox configuration.py, gmazoyer-style ---
+# Add any valid NetBox configuration.py setting here as key: value.
+# ALLOWED_HOSTS, DATABASE, REDIS, SECRET_KEY, and PLUGINS are handled
+# separately below/in the template — don't duplicate them in here.
+netbox_config:
+  TIME_ZONE: "Australia/Brisbane"
+
+netbox_allowed_hosts:
+  - localhost
+  - netbox.gswsystems.com
+
+netbox_database_settings:
+  NAME: "{{ netbox_db_name }}"
+  USER: "{{ netbox_db_user }}"
+  PASSWORD: "{{ vault_netbox_db_password }}"
+  HOST: "{{ netbox_db_host }}"
+  PORT: "{{ netbox_db_port }}"
+  CONN_MAX_AGE: 300
+
+netbox_redis_settings:
+  tasks:
+    HOST: "{{ netbox_redis_host }}"
+    PORT: "{{ netbox_redis_port }}"
+    PASSWORD: "{{ vault_redis_password }}"
+    DATABASE: "{{ netbox_redis_tasks_db }}"
+    SSL: false
+  caching:
+    HOST: "{{ netbox_redis_host }}"
+    PORT: "{{ netbox_redis_port }}"
+    PASSWORD: "{{ vault_redis_password }}"
+    DATABASE: "{{ netbox_redis_cache_db }}"
+    SSL: false

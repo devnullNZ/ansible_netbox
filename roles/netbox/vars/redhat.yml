@@ -1,0 +1,12 @@
+---
+netbox_python_pkg: "python{{ netbox_python_version }}"
+netbox_venv_python_bin: "/usr/bin/python{{ netbox_python_version }}"
+netbox_build_deps:
+  - gcc
+  - libxml2-devel
+  - libxslt-devel
+  - libffi-devel
+  - "python{{ netbox_python_version }}-devel"
+  - openssl-devel
+  - zlib-devel
+  - libpq-devel

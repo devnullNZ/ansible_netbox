@@ -1,0 +1,43 @@
+---
+- name: Stop and disable netbox services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop:
+    - netbox
+    - netbox-rq
+  failed_when: false
+  tags: uninstall
+
+- name: Remove netbox systemd unit files
+  ansible.builtin.file:
+    path: "/etc/systemd/system/{{ item }}.service"
+    state: absent
+  loop:
+    - netbox
+    - netbox-rq
+  notify: reload systemd
+  tags: uninstall
+
+- name: Remove netbox home directory
+  ansible.builtin.file:
+    path: "{{ netbox_home }}"
+    state: absent
+  tags: uninstall
+
+- name: Remove netbox system user
+  ansible.builtin.user:
+    name: "{{ netbox_user }}"
+    state: absent
+    remove: true
+  tags: uninstall
+
+- name: Remove firewalld rule for netbox web port (RHEL)
+  ansible.posix.firewalld:
+    port: "{{ netbox_web_port }}/tcp"
+    permanent: true
+    state: disabled
+    immediate: true
+  when: ansible_facts['os_family'] == "RedHat"
+  tags: uninstall

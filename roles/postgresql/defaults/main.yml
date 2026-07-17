@@ -1,0 +1,23 @@
+---
+postgresql_version: "16"   # only used for RHEL 9 PGDG install; RHEL 10 and Debian use native repo version
+postgresql_listen_addresses: "localhost"
+
+postgresql_databases:
+  - name: "{{ netbox_db_name }}"
+    owner: "{{ netbox_db_user }}"
+
+postgresql_users:
+  - name: "{{ netbox_db_user }}"
+    password: "{{ vault_netbox_db_password }}"
+    db: "{{ netbox_db_name }}"
+
+postgresql_hba_entries:
+  - type: local
+    database: all
+    user: postgres
+    auth_method: peer
+  - type: host
+    database: "{{ netbox_db_name }}"
+    user: "{{ netbox_db_user }}"
+    address: "127.0.0.1/32"
+    auth_method: scram-sha-256

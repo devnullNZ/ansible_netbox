@@ -1,0 +1,17 @@
+---
+- name: Deploy NetBox
+  hosts: netbox_servers
+  become: true
+  vars_files:
+    - vault/secrets.yml
+  pre_tasks:
+    - name: Fail on unsupported OS family
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] in ['Debian', 'RedHat']
+        fail_msg: "This playbook only supports Debian and RedHat OS families"
+  roles:
+    - { role: postgresql, tags: postgresql }
+    - { role: redis, tags: redis }
+    - { role: netbox, tags: netbox }
+    - { role: nginx, tags: nginx }

@@ -1,0 +1,14 @@
+---
+- name: Install PostgreSQL and psycopg2 dependency
+  ansible.builtin.apt:
+    name:
+      - "postgresql-{{ postgresql_version }}"
+      - python3-psycopg2
+    state: present
+    update_cache: true
+
+- name: Ensure PostgreSQL is running and enabled
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: started
+    enabled: true

@@ -1,0 +1,33 @@
+{% if nginx_tls_enabled and nginx_tls_redirect %}
+server {
+    listen {{ nginx_listen_port }};
+    server_name {{ nginx_server_name }};
+    return 301 https://$host$request_uri;
+}
+{% endif %}
+
+server {
+{% if nginx_tls_enabled %}
+    listen {{ nginx_tls_port }} ssl;
+    ssl_certificate {{ nginx_tls_cert }};
+    ssl_certificate_key {{ nginx_tls_key }};
+{% else %}
+    listen {{ nginx_listen_port }};
+{% endif %}
+    server_name {{ nginx_server_name }};
+
+    client_max_body_size {{ nginx_client_max_body_size }};
+
+    location /static/ {
+        alias {{ netbox_home }}/netbox/static/;
+    }
+
+    location / {
+        proxy_pass http://{{ nginx_upstream_host }}:{{ nginx_upstream_port }};
+        proxy_set_header X-Forwarded-Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        add_header P3P 'CP="ALL DSP COR PSAa PSDa OUR NOR ONL UNI COM NAV"';
+    }
+}

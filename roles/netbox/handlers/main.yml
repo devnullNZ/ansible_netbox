@@ -1,0 +1,16 @@
+---
+- name: reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
+- name: restart netbox
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: true
+  loop:
+    - netbox
+    - netbox-rq
+
+- name: restore netbox selinux context
+  ansible.builtin.command: "restorecon -Rv {{ netbox_home }}"

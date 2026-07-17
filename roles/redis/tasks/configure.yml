@@ -1,0 +1,15 @@
+---
+- name: Template redis/valkey conf
+  ansible.builtin.template:
+    src: redis.conf.j2
+    dest: "{{ redis_conf_path }}"
+    owner: "{{ redis_system_user }}"
+    group: "{{ redis_system_user }}"
+    mode: "0640"
+  notify: restart redis
+
+- name: Ensure redis/valkey is running and enabled
+  ansible.builtin.systemd:
+    name: "{{ redis_service_name }}"
+    state: started
+    enabled: true

@@ -1,0 +1,4 @@
+---
+redis_package_name: "{{ 'valkey' if ansible_facts['distribution_major_version'] | int >= 10 else 'redis' }}"
+redis_service_name: "{{ redis_package_name }}"
+redis_system_user: "{{ redis_package_name }}"

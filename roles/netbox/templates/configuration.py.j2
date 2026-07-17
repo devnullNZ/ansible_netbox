@@ -1,0 +1,13 @@
+# This file is managed by Ansible. Manual changes will be overwritten.
+
+ALLOWED_HOSTS = {{ netbox_allowed_hosts }}
+
+DATABASE = {{ netbox_database_settings }}
+
+REDIS = {{ netbox_redis_settings }}
+
+SECRET_KEY = '{{ netbox_secret_key }}'
+
+{% for key, value in netbox_config.items() %}
+{{ key }} = {{ value }}
+{% endfor %}

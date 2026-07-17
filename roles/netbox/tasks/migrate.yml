@@ -1,0 +1,27 @@
+---
+- name: Run database migrations
+  ansible.builtin.command: "{{ netbox_venv }}/bin/python3 {{ netbox_home }}/netbox/manage.py migrate"
+  become_user: "{{ netbox_user }}"
+  register: migrate_result
+  changed_when: "'No migrations to apply' not in migrate_result.stdout"
+
+- name: Collect static files
+  ansible.builtin.command: "{{ netbox_venv }}/bin/python3 {{ netbox_home }}/netbox/manage.py collectstatic --no-input"
+  become_user: "{{ netbox_user }}"
+  changed_when: true
+
+- name: Restore SELinux context on collected static files (RHEL only)
+  ansible.builtin.command: "restorecon -Rv {{ netbox_home }}/netbox/static"
+  when: ansible_facts['os_family'] == "RedHat"
+  changed_when: false
+
+- name: Create superuser (idempotent via management command)
+  ansible.builtin.shell: |
+    {{ netbox_venv }}/bin/python3 {{ netbox_home }}/netbox/manage.py shell -c "
+    from django.contrib.auth import get_user_model;
+    User = get_user_model();
+    User.objects.filter(username='{{ netbox_superuser_username }}').exists() or \
+    User.objects.create_superuser('{{ netbox_superuser_username }}', '{{ netbox_superuser_email }}', '{{ netbox_superuser_password }}')"
+  become_user: "{{ netbox_user }}"
+  changed_when: false
+  no_log: true

@@ -1,0 +1,23 @@
+---
+- name: Template NetBox nginx site config
+  ansible.builtin.template:
+    src: netbox.conf.j2
+    dest: "{{ nginx_conf_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify: restart nginx
+
+- name: Symlink site into sites-enabled (Debian)
+  ansible.builtin.file:
+    src: "{{ nginx_conf_path }}"
+    dest: "{{ nginx_conf_enabled_path }}"
+    state: link
+  when: nginx_uses_sites_enabled
+  notify: restart nginx
+
+- name: Ensure nginx is running and enabled
+  ansible.builtin.systemd:
+    name: "{{ nginx_service_name }}"
+    state: started
+    enabled: true

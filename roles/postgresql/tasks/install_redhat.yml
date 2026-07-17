@@ -1,0 +1,76 @@
+---
+- name: Check if PGDG repo already configured (RHEL 9 only)
+  ansible.builtin.stat:
+    path: /etc/yum.repos.d/pgdg-redhat-all.repo
+  register: pgdg_repo
+  when: postgresql_use_pgdg
+
+- name: Install PGDG repo RPM (RHEL 9 only)
+  ansible.builtin.dnf:
+    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-{{ ansible_facts['distribution_major_version'] }}-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
+    state: present
+    disable_gpg_check: true   # bootstrapping the repo/key itself
+  when:
+    - postgresql_use_pgdg
+    - not pgdg_repo.stat.exists
+
+- name: Check postgresql AppStream module state (RHEL 9 only)
+  ansible.builtin.command: dnf module list --enabled postgresql
+  register: pg_module_check
+  changed_when: false
+  failed_when: false
+  when:
+    - postgresql_use_pgdg
+    - not pgdg_repo.stat.exists
+
+- name: Disable built-in postgresql AppStream module (RHEL 9 only)
+  ansible.builtin.command: dnf -qy module disable postgresql
+  when:
+    - postgresql_use_pgdg
+    - not pgdg_repo.stat.exists
+    - "'postgresql' in pg_module_check.stdout | default('')"
+  changed_when: true
+
+- name: Install PostgreSQL from PGDG (RHEL 9)
+  ansible.builtin.dnf:
+    name:
+      - "postgresql{{ postgresql_version }}-server"
+      - "postgresql{{ postgresql_version }}"
+      - python3-psycopg2
+    state: present
+  when: postgresql_use_pgdg
+
+- name: Install PostgreSQL from native AppStream (RHEL 10+)
+  ansible.builtin.dnf:
+    name:
+      - postgresql-server
+      - postgresql
+      - python3-psycopg2
+    state: present
+  when: not postgresql_use_pgdg
+
+- name: Initialize database
+  ansible.builtin.command: "{{ postgresql_bin_dir }}/postgresql-setup --initdb"
+  args:
+    creates: "{{ postgresql_data_dir }}/PG_VERSION"
+  when: not postgresql_use_pgdg
+
+- name: Initialize database (PGDG naming, RHEL 9)
+  ansible.builtin.command: "{{ postgresql_bin_dir }}/postgresql-{{ postgresql_version }}-setup initdb"
+  args:
+    creates: "{{ postgresql_data_dir }}/PG_VERSION"
+  when: postgresql_use_pgdg
+
+- name: Ensure PostgreSQL is running and enabled
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: started
+    enabled: true
+
+- name: Allow postgres through firewalld if remote access needed
+  ansible.posix.firewalld:
+    service: postgresql
+    permanent: true
+    state: enabled
+    immediate: true
+  when: postgresql_listen_addresses != "localhost"

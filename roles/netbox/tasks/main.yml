@@ -1,0 +1,62 @@
+---
+- name: Load OS-specific variables
+  ansible.builtin.include_vars: "{{ ansible_facts['os_family'] | lower }}.yml"
+
+- name: Include uninstall tasks
+  ansible.builtin.include_tasks: uninstall.yml
+  tags: uninstall
+
+- name: Create netbox system user
+  ansible.builtin.user:
+    name: "{{ netbox_user }}"
+    system: true
+    home: "{{ netbox_home }}"
+    create_home: false
+    shell: /usr/sbin/nologin
+  tags: install
+
+- name: Create netbox home directory
+  ansible.builtin.file:
+    path: "{{ netbox_home }}"
+    state: directory
+    owner: "{{ netbox_user }}"
+    group: "{{ netbox_group }}"
+    mode: "0750"
+  tags: install
+
+- name: Include OS-specific package install tasks
+  ansible.builtin.include_tasks: "install_{{ ansible_facts['os_family'] | lower }}.yml"
+  tags: install
+
+- name: Clone NetBox at pinned version
+  ansible.builtin.git:
+    repo: "{{ netbox_git_url }}"
+    dest: "{{ netbox_home }}"
+    version: "{{ netbox_version }}"
+  become_user: "{{ netbox_user }}"
+  notify: restart netbox
+  tags: install
+
+- name: Create virtualenv and install requirements
+  ansible.builtin.pip:
+    requirements: "{{ netbox_home }}/requirements.txt"
+    virtualenv: "{{ netbox_venv }}"
+    virtualenv_command: "{{ netbox_venv_python_bin }} -m venv"
+  become_user: "{{ netbox_user }}"
+  tags: install
+
+- name: Install plugin packages
+  ansible.builtin.pip:
+    name: "{{ item.pip }}"
+    virtualenv: "{{ netbox_venv }}"
+    state: "{{ item.state | default('present') }}"
+  loop: "{{ netbox_plugins }}"
+  when: netbox_plugins | length > 0
+  notify: restart netbox
+  tags: install
+
+- import_tasks: configure.yml
+  tags: install
+
+- import_tasks: migrate.yml
+  tags: install

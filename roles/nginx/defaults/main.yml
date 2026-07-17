@@ -1,0 +1,13 @@
+---
+nginx_server_name: netbox.gswsystems.com
+nginx_listen_port: 80
+nginx_tls_enabled: false
+nginx_tls_port: 443
+nginx_tls_cert: "/etc/pki/tls/certs/{{ nginx_server_name }}.crt"
+nginx_tls_key: "/etc/pki/tls/private/{{ nginx_server_name }}.key"
+nginx_tls_redirect: false
+
+nginx_upstream_host: "127.0.0.1"
+nginx_upstream_port: "{{ netbox_web_port | default(8001) }}"
+
+nginx_client_max_body_size: "25m"

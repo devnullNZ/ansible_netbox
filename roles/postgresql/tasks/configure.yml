@@ -1,0 +1,50 @@
+---
+- name: Set listen_addresses
+  community.postgresql.postgresql_alter_system:
+    param: listen_addresses
+    value: "{{ postgresql_listen_addresses }}"
+  become_user: "{{ postgresql_system_user }}"
+  notify: restart postgresql
+
+- name: Template pg_hba.conf
+  ansible.builtin.template:
+    src: pg_hba.conf.j2
+    dest: "{{ postgresql_hba_path }}"
+    owner: "{{ postgresql_system_user }}"
+    group: "{{ postgresql_system_user }}"
+    mode: "0640"
+  notify: restart postgresql
+
+- name: Set SELinux context for data dir (RHEL only)
+  community.general.sefcontext:
+    target: "{{ postgresql_data_dir }}(/.*)?"
+    setype: postgresql_db_t
+    state: present
+  when: ansible_facts['os_family'] == "RedHat"
+  notify: restore postgresql selinux context
+
+- name: Create NetBox DB user
+  community.postgresql.postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password }}"
+    encrypted: true
+  loop: "{{ postgresql_users }}"
+  become_user: "{{ postgresql_system_user }}"
+  no_log: true
+
+- name: Create NetBox database
+  community.postgresql.postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner }}"
+    encoding: UTF-8
+  loop: "{{ postgresql_databases }}"
+  become_user: "{{ postgresql_system_user }}"
+
+- name: Grant privileges to NetBox DB user on database
+  community.postgresql.postgresql_privs:
+    login_db: "{{ item.db }}"
+    role: "{{ item.name }}"
+    type: database
+    privs: ALL
+  loop: "{{ postgresql_users }}"
+  become_user: "{{ postgresql_system_user }}"

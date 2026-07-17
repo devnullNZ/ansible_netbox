@@ -1,0 +1,27 @@
+---
+- name: Template configuration.py
+  ansible.builtin.template:
+    src: configuration.py.j2
+    dest: "{{ netbox_home }}/netbox/netbox/configuration.py"
+    owner: "{{ netbox_user }}"
+    group: "{{ netbox_group }}"
+    mode: "0640"
+  notify: restart netbox
+
+- name: Template gunicorn config
+  ansible.builtin.template:
+    src: gunicorn.py.j2
+    dest: "{{ netbox_home }}/gunicorn.py"
+    owner: "{{ netbox_user }}"
+    group: "{{ netbox_group }}"
+
+- name: Deploy systemd units
+  ansible.builtin.template:
+    src: "{{ item }}.service.j2"
+    dest: "/etc/systemd/system/{{ item }}.service"
+  loop:
+    - netbox
+    - netbox-rq
+  notify:
+    - reload systemd
+    - restart netbox
