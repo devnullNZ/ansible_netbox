@@ -12,6 +12,7 @@
     system: true
     home: "{{ netbox_user_home }}"
     create_home: true
+    move_home: true
     shell: /usr/sbin/nologin
   tags: install
 
