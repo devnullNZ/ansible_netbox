@@ -46,6 +46,8 @@
       - postgresql-server
       - postgresql
       - python3-psycopg2
+      - postgresql-libs
+      - libpq
     state: present
   when: not postgresql_use_pgdg
 
