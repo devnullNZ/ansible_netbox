@@ -1,12 +1,4 @@
 # roles/redis/tasks/discover_conf_path_redhat.yml
----
-- name: Check if redis/valkey package is installed
-  ansible.builtin.command: "rpm -q {{ redis_package_name }}"
-  register: redis_pkg_installed
-  changed_when: false
-  failed_when: false
-  tags: install
-
 - name: Discover actual config path from package metadata
   ansible.builtin.command: "rpm -qc {{ redis_package_name }}"
   register: redis_pkg_conf
@@ -14,8 +6,8 @@
   when: redis_pkg_installed.rc == 0
   tags: install
 
-- name: Set redis_conf_path from package metadata
+- name: Set redis_conf_path from package metadata (exclude sentinel config)
   ansible.builtin.set_fact:
-    redis_conf_path: "{{ redis_pkg_conf.stdout_lines | select('match', '.*\\.conf$') | first }}"
+    redis_conf_path: "{{ redis_pkg_conf.stdout_lines | select('match', '.*\\.conf$') | reject('search', 'sentinel') | first }}"
   when: redis_pkg_installed.rc == 0
   tags: install

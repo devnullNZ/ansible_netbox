@@ -44,7 +44,7 @@ netbox_config:
 
 netbox_allowed_hosts:
   - localhost
-  - netbox.gswsystems.com
+  - netbox.local
 
 netbox_database_settings:
   NAME: "{{ netbox_db_name }}"
