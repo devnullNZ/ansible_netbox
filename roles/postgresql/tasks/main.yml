@@ -5,7 +5,6 @@
 
 - name: Include uninstall tasks
   ansible.builtin.include_tasks: uninstall.yml
-  when: postgresql_run_uninstall | default(false) | bool
   tags: uninstall
 
 - name: Include OS-specific install tasks

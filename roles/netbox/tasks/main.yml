@@ -5,7 +5,6 @@
 
 - name: Include uninstall tasks
   ansible.builtin.include_tasks: uninstall.yml
-  when: netbox_run_uninstall | default(false) | bool
   tags: uninstall
 
 - name: Create netbox system user
