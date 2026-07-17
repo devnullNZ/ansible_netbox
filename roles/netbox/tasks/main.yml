@@ -24,7 +24,7 @@
     state: directory
     owner: "{{ netbox_user }}"
     group: "{{ netbox_group }}"
-    mode: "0750"
+    mode: "0755"
   tags: install
 
 - name: Include OS-specific package install tasks
