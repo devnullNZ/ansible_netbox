@@ -1,5 +1,5 @@
 ---
-netbox_version: "v4.1.7"
+netbox_version: "v4.6.5"
 netbox_git_url: https://github.com/netbox-community/netbox.git
 netbox_user: netbox
 netbox_group: netbox
