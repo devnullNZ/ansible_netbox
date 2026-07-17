@@ -7,6 +7,7 @@
     group: "{{ netbox_group }}"
     mode: "0640"
   notify: restart netbox
+  tags: install
 
 - name: Template gunicorn config
   ansible.builtin.template:
@@ -14,6 +15,7 @@
     dest: "{{ netbox_home }}/gunicorn.py"
     owner: "{{ netbox_user }}"
     group: "{{ netbox_group }}"
+  tags: install
 
 - name: Deploy systemd units
   ansible.builtin.template:
@@ -25,3 +27,4 @@
   notify:
     - reload systemd
     - restart netbox
+  tags: install

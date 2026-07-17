@@ -4,3 +4,4 @@
     name: "{{ [netbox_python_pkg, netbox_python_venv_pkg] + netbox_build_deps }}"
     state: present
     update_cache: true
+  tags: install
