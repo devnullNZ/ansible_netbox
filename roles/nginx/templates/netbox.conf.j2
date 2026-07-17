@@ -1,6 +1,6 @@
 {% if nginx_tls_enabled and nginx_tls_redirect %}
 server {
-    listen {{ nginx_listen_port }};
+    listen {{ nginx_listen_port }} default_server;
     server_name {{ nginx_server_name }};
     return 301 https://$host$request_uri;
 }
@@ -8,11 +8,11 @@ server {
 
 server {
 {% if nginx_tls_enabled %}
-    listen {{ nginx_tls_port }} ssl;
+    listen {{ nginx_tls_port }} ssl default_server;
     ssl_certificate {{ nginx_tls_cert }};
     ssl_certificate_key {{ nginx_tls_key }};
 {% else %}
-    listen {{ nginx_listen_port }};
+    listen {{ nginx_listen_port }} default_server;
 {% endif %}
     server_name {{ nginx_server_name }};
 
