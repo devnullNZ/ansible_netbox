@@ -10,12 +10,12 @@
   ansible.builtin.user:
     name: "{{ netbox_user }}"
     system: true
-    home: "{{ netbox_home }}"
-    create_home: false
+    home: "{{ netbox_user_home }}"
+    create_home: true
     shell: /usr/sbin/nologin
   tags: install
 
-- name: Create netbox home directory
+- name: Create netbox install directory
   ansible.builtin.file:
     path: "{{ netbox_home }}"
     state: directory

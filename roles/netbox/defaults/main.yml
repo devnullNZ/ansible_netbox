@@ -67,3 +67,5 @@ netbox_redis_settings:
     PASSWORD: "{{ vault_redis_password }}"
     DATABASE: "{{ netbox_redis_cache_db }}"
     SSL: false
+
+netbox_user_home: /home/netbox
