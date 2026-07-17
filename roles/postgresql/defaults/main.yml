@@ -19,7 +19,7 @@ postgresql_hba_entries:
   - type: host
     database: "{{ netbox_db_name }}"
     user: "{{ netbox_db_user }}"
-    address: "127.0.0.1/32"
+    address: "localhost"
     auth_method: scram-sha-256
   - type: host
     database: "{{ netbox_db_name }}"
