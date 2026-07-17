@@ -16,8 +16,8 @@ pre_tasks:
     when: uninstall_confirm.user_input != "yes"
     tags: always
 
-    roles:
-    - netbox
-    - redis
-    - postgresql
-    - nginx
+roles:
+- netbox
+- redis
+- postgresql
+- nginx
