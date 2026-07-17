@@ -1,4 +1,3 @@
----
 - name: Install EPEL (required for redis on RHEL 9)
   ansible.builtin.dnf:
     name: epel-release
@@ -10,14 +9,7 @@
     name: "{{ redis_package_name }}"
     state: present
 
-- name: Discover actual config path from package metadata
-  ansible.builtin.command: "rpm -qc {{ redis_package_name }}"
-  register: redis_pkg_conf
-  changed_when: false
-
-- name: Set redis_conf_path from package metadata
-  ansible.builtin.set_fact:
-    redis_conf_path: "{{ redis_pkg_conf.stdout_lines | select('match', '.*\\.conf$') | first }}"
+- import_tasks: discover_conf_path_redhat.yml
 
 - name: Allow redis/valkey through firewalld if remote access needed
   ansible.posix.firewalld:

@@ -1,0 +1,17 @@
+---
+- name: Check if redis/valkey package is installed
+  ansible.builtin.command: "rpm -q {{ redis_package_name }}"
+  register: redis_pkg_installed
+  changed_when: false
+  failed_when: false
+
+- name: Discover actual config path from package metadata
+  ansible.builtin.command: "rpm -qc {{ redis_package_name }}"
+  register: redis_pkg_conf
+  changed_when: false
+  when: redis_pkg_installed.rc == 0
+
+- name: Set redis_conf_path from package metadata
+  ansible.builtin.set_fact:
+    redis_conf_path: "{{ redis_pkg_conf.stdout_lines | select('match', '.*\\.conf$') | first }}"
+  when: redis_pkg_installed.rc == 0

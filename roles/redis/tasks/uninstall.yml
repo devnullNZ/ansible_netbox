@@ -1,4 +1,7 @@
 ---
+- import_tasks: discover_conf_path_redhat.yml
+  when: ansible_facts['os_family'] == "RedHat"
+
 - name: Stop and disable redis/valkey service
   ansible.builtin.systemd:
     name: "{{ redis_service_name }}"
@@ -27,6 +30,7 @@
     path: "{{ item }}"
     state: absent
   loop:
-    - "{{ redis_conf_path }}"
+    - "{{ redis_conf_path | default(omit) }}"
     - "/var/lib/{{ redis_service_name }}"
+  when: item != omit
   tags: uninstall
