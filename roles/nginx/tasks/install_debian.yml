@@ -6,6 +6,14 @@
     update_cache: true
   tags: install
 
+# roles/nginx/tasks/install_redhat.yml (and install_debian.yml)
+- name: Add nginx user to netbox group for static file access
+  ansible.builtin.user:
+    name: www-data   # or www-data on Debian — check nginx_system_user var if you have one
+    groups: "{{ netbox_group }}"
+    append: true
+  tags: install
+
 - name: Remove default site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default

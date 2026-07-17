@@ -5,6 +5,14 @@
     state: present
   tags: install
 
+# roles/nginx/tasks/install_redhat.yml (and install_debian.yml)
+- name: Add nginx user to netbox group for static file access
+  ansible.builtin.user:
+    name: nginx   # or www-data on Debian — check nginx_system_user var if you have one
+    groups: "{{ netbox_group }}"
+    append: true
+  tags: install
+
 - name: Allow HTTP through firewalld
   ansible.posix.firewalld:
     service: http
