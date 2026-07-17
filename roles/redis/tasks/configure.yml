@@ -7,9 +7,11 @@
     group: "{{ redis_system_user }}"
     mode: "0640"
   notify: restart redis
+  tags: install
 
 - name: Ensure redis/valkey is running and enabled
   ansible.builtin.systemd:
     name: "{{ redis_service_name }}"
     state: started
     enabled: true
+  tags: install
