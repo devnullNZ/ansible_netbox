@@ -15,6 +15,7 @@
     group: "{{ postgresql_system_user }}"
     mode: "0640"
   notify: restart postgresql
+  register: pg_hba_result
   tags: install
 
 - name: Restart postgresql if pg_hba.conf changed
