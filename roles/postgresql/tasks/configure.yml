@@ -5,6 +5,7 @@
     value: "{{ postgresql_listen_addresses }}"
   become_user: "{{ postgresql_system_user }}"
   notify: restart postgresql
+  tags: install
 
 - name: Template pg_hba.conf
   ansible.builtin.template:
@@ -14,6 +15,7 @@
     group: "{{ postgresql_system_user }}"
     mode: "0640"
   notify: restart postgresql
+  tags: install
 
 - name: Set SELinux context for data dir (RHEL only)
   community.general.sefcontext:
@@ -22,6 +24,7 @@
     state: present
   when: ansible_facts['os_family'] == "RedHat"
   notify: restore postgresql selinux context
+  tags: install
 
 - name: Create NetBox DB user
   community.postgresql.postgresql_user:
@@ -31,6 +34,7 @@
   loop: "{{ postgresql_users }}"
   become_user: "{{ postgresql_system_user }}"
   no_log: true
+  tags: install
 
 - name: Create NetBox database
   community.postgresql.postgresql_db:
@@ -39,6 +43,7 @@
     encoding: UTF-8
   loop: "{{ postgresql_databases }}"
   become_user: "{{ postgresql_system_user }}"
+  tags: install
 
 - name: Grant privileges to NetBox DB user on database
   community.postgresql.postgresql_privs:
@@ -48,3 +53,4 @@
     privs: ALL
   loop: "{{ postgresql_users }}"
   become_user: "{{ postgresql_system_user }}"
+  tags: install

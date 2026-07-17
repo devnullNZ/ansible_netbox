@@ -4,9 +4,11 @@
     name: "{{ nginx_package_name }}"
     state: present
     update_cache: true
+  tags: install
 
 - name: Remove default site
   ansible.builtin.file:
     path: /etc/nginx/sites-enabled/default
     state: absent
   notify: restart nginx
+  tags: install

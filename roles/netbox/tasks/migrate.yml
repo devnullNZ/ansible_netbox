@@ -4,16 +4,19 @@
   become_user: "{{ netbox_user }}"
   register: migrate_result
   changed_when: "'No migrations to apply' not in migrate_result.stdout"
+  tags: install
 
 - name: Collect static files
   ansible.builtin.command: "{{ netbox_venv }}/bin/python3 {{ netbox_home }}/netbox/manage.py collectstatic --no-input"
   become_user: "{{ netbox_user }}"
   changed_when: true
+  tags: install
 
 - name: Restore SELinux context on collected static files (RHEL only)
   ansible.builtin.command: "restorecon -Rv {{ netbox_home }}/netbox/static"
   when: ansible_facts['os_family'] == "RedHat"
   changed_when: false
+  tags: install
 
 - name: Create superuser (idempotent via management command)
   ansible.builtin.shell: |
@@ -25,3 +28,4 @@
   become_user: "{{ netbox_user }}"
   changed_when: false
   no_log: true
+  tags: install

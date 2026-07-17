@@ -4,11 +4,13 @@
     subscription-manager repos --enable
     codeready-builder-for-rhel-{{ ansible_facts['distribution_major_version'] }}-{{ ansible_facts['architecture'] }}-rpms
   changed_when: true
+  tags: install
 
 - name: Install Python and build dependencies
   ansible.builtin.dnf:
     name: "{{ [netbox_python_pkg, netbox_python_pkg + '-devel', netbox_python_pkg + '-pip', 'git'] + netbox_build_deps }}"
     state: present
+  tags: install
 
 - name: Allow NetBox web port through firewalld
   ansible.posix.firewalld:
@@ -16,6 +18,7 @@
     permanent: true
     state: enabled
     immediate: true
+  tags: install
 
 - name: Set SELinux context for NetBox home
   community.general.sefcontext:
@@ -23,9 +26,11 @@
     setype: httpd_sys_rw_content_t
     state: present
   notify: restore netbox selinux context
+  tags: install
 
 - name: Allow httpd/proxy network connect (Caddy -> gunicorn over TCP)
   ansible.posix.seboolean:
     name: httpd_can_network_connect
     state: true
     persistent: true
+  tags: install

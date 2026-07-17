@@ -3,6 +3,7 @@
   ansible.builtin.dnf:
     name: "{{ nginx_package_name }}"
     state: present
+  tags: install
 
 - name: Allow HTTP through firewalld
   ansible.posix.firewalld:
@@ -10,6 +11,7 @@
     permanent: true
     state: enabled
     immediate: true
+  tags: install
 
 - name: Allow HTTPS through firewalld
   ansible.posix.firewalld:
@@ -18,9 +20,11 @@
     state: enabled
     immediate: true
   when: nginx_tls_enabled
+  tags: install
 
 - name: Allow nginx to proxy to gunicorn over TCP (SELinux)
   ansible.posix.seboolean:
     name: httpd_can_network_connect
     state: true
     persistent: true
+  tags: install
