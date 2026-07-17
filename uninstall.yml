@@ -1,0 +1,30 @@
+# uninstall.yml
+---
+- name: Completely remove NetBox and its dependencies
+  hosts: netbox_servers
+  become: true
+  vars_files:
+    - vault/secrets.yml
+  vars:
+    netbox_run_uninstall: true
+    postgresql_run_uninstall: true
+    redis_run_uninstall: true
+    nginx_run_uninstall: true
+  pre_tasks:
+    - name: Confirm destructive uninstall
+      ansible.builtin.pause:
+        prompt: >
+          This will PERMANENTLY remove NetBox, its database, its Redis/Valkey data,
+          and all associated packages/config on {{ inventory_hostname }}.
+          Type 'yes' to continue
+      register: uninstall_confirm
+
+    - name: Abort if not confirmed
+      ansible.builtin.fail:
+        msg: "Uninstall aborted — confirmation not given"
+      when: uninstall_confirm.user_input != "yes"
+
+  roles:
+    - { role: netbox, tags: uninstall }
+    - { role: redis, tags: uninstall }
+    - { role: postgresql, tags: uninstall }
