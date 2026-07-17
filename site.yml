@@ -1,3 +1,4 @@
+# site.yml
 ---
 - name: Deploy NetBox
   hosts: netbox_servers
@@ -11,7 +12,7 @@
           - ansible_facts['os_family'] in ['Debian', 'RedHat']
         fail_msg: "This playbook only supports Debian and RedHat OS families"
   roles:
-    - { role: postgresql, tags: postgresql }
-    - { role: redis, tags: redis }
-    - { role: netbox, tags: netbox }
-    - { role: nginx, tags: nginx }
+    - postgresql
+    - redis
+    - netbox
+    - nginx

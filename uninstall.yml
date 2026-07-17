@@ -5,11 +5,6 @@
   become: true
   vars_files:
     - vault/secrets.yml
-  vars:
-    netbox_run_uninstall: true
-    postgresql_run_uninstall: true
-    redis_run_uninstall: true
-    nginx_run_uninstall: true
   pre_tasks:
     - name: Confirm destructive uninstall
       ansible.builtin.pause:
@@ -25,6 +20,6 @@
       when: uninstall_confirm.user_input != "yes"
 
   roles:
-    - { role: netbox, tags: uninstall }
-    - { role: redis, tags: uninstall }
-    - { role: postgresql, tags: uninstall }
+    - netbox
+    - redis
+    - postgresql
