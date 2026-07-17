@@ -1,5 +1,5 @@
 ---
-nginx_server_name: netbox.gswsystems.com
+nginx_server_name: netbox.local
 nginx_listen_port: 80
 nginx_tls_enabled: false
 nginx_tls_port: 443

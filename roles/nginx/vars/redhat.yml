@@ -1,5 +1,5 @@
 ---
-nginx_package_name: nginx-core
+nginx_package_name: nginx
 nginx_service_name: nginx
 nginx_conf_path: "/etc/nginx/conf.d/netbox.conf"
 nginx_uses_sites_enabled: false
