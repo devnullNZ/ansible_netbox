@@ -17,6 +17,13 @@
   notify: restart postgresql
   tags: install
 
+- name: Restart postgresql if pg_hba.conf changed
+  ansible.builtin.systemd:
+    name: "{{ postgresql_service_name }}"
+    state: restarted
+  when: pg_hba_result is changed
+  tags: install
+
 - name: Set SELinux context for data dir (RHEL only)
   community.general.sefcontext:
     target: "{{ postgresql_data_dir }}(/.*)?"
