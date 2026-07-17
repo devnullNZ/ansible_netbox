@@ -3,3 +3,4 @@
   ansible.builtin.systemd:
     name: "{{ nginx_service_name }}"
     state: restarted
+  tags: install

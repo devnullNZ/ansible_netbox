@@ -3,6 +3,8 @@
   ansible.builtin.systemd:
     name: "{{ postgresql_service_name }}"
     state: restarted
+  tags: install
 
 - name: restore postgresql selinux context
   ansible.builtin.command: "restorecon -Rv {{ postgresql_data_dir }}"
+  tags: install

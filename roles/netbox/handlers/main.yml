@@ -2,6 +2,7 @@
 - name: reload systemd
   ansible.builtin.systemd:
     daemon_reload: true
+  tags: install
 
 - name: restart netbox
   ansible.builtin.systemd:
@@ -11,6 +12,8 @@
   loop:
     - netbox
     - netbox-rq
+  tags: install
 
 - name: restore netbox selinux context
   ansible.builtin.command: "restorecon -Rv {{ netbox_home }}"
+  tags: install
