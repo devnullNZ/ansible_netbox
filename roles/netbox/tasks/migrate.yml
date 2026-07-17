@@ -21,11 +21,13 @@
 - name: Create superuser (idempotent via management command)
   ansible.builtin.shell: |
     {{ netbox_venv }}/bin/python3 {{ netbox_home }}/netbox/manage.py shell -c "
-    from django.contrib.auth import get_user_model;
-    User = get_user_model();
-    User.objects.filter(username='{{ netbox_superuser_username }}').exists() or \
-    User.objects.create_superuser('{{ netbox_superuser_username }}', '{{ netbox_superuser_email }}', '{{ netbox_superuser_password }}')"
+    from django.contrib.auth import get_user_model
+    from users.models import UserConfig
+    User = get_user_model()
+    if not User.objects.filter(username='{{ netbox_superuser_username }}').exists():
+        user = User.objects.create_superuser('{{ netbox_superuser_username }}', '{{ netbox_superuser_email }}', '{{ netbox_superuser_password }}')
+        UserConfig.objects.get_or_create(user=user, defaults={'data': {}})
+    "
   become_user: "{{ netbox_user }}"
   changed_when: false
   no_log: true
-  tags: install
