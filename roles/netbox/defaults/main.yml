@@ -15,7 +15,7 @@ netbox_superuser_email: admin@gswsystems.com
 
 netbox_secret_key: "{{ vault_netbox_secret_key }}"
 
-netbox_api_token_peppers = "1: 'kp7ht*76fiWNhUi5dHfASLlYUE_S^gI^(7J^K5M!ZfoH@vl&b_',"
+netbox_api_token_peppers = "{ 1: 'kp7ht*76fiWNhUi5dHfASLlYUE_S^gI^(7J^K5M!ZfoH@vl&b_', }"
 
 # DB/Redis connection facts consumed by the postgresql/redis roles too —
 # keep these as the single source of truth referenced from both places.
