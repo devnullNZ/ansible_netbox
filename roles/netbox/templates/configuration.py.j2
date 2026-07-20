@@ -10,7 +10,11 @@ REDIS = {{ netbox_redis_settings }}
 
 SECRET_KEY = '{{ netbox_secret_key }}'
 
-API_TOKEN_PEPPERS = "{{ netbox_api_token_peppers }}
+API_TOKEN_PEPPERS = {
+{% for key, value in api_token_peppers.items() %}
+    {{ key }}: {{ value | tojson }},
+{% endfor %}
+}
 
 {% for key, value in netbox_config.items() %}
 {% if value is string %}
