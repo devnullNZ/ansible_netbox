@@ -42,6 +42,7 @@ netbox_plugins:
 # separately below/in the template — don't duplicate them in here.
 netbox_config:
   TIME_ZONE: "Australia/Brisbane"
+  PLUGINS: "{{ netbox_plugins | selectattr('state', 'ne', 'absent') | map(attribute='name') | list }}"
   PLUGINS_CONFIG:
     netbox_ping:
       default_timeout: 800
