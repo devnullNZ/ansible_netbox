@@ -31,12 +31,10 @@ netbox_redis_tasks_db: 1
 netbox_redis_cache_db: 0
 
 # --- Plugins: name + pip source + desired state ---
-netbox_plugins: []
-# Example:
-# netbox_plugins:
-#   - name: netbox_ping
-#     pip: netbox-ping
-#     state: present
+netbox_plugins:
+- name: netbox_ping
+  pip: netbox-ping
+  state: present
 
 # --- Dict-driven NetBox configuration.py, gmazoyer-style ---
 # Add any valid NetBox configuration.py setting here as key: value.
@@ -44,6 +42,10 @@ netbox_plugins: []
 # separately below/in the template — don't duplicate them in here.
 netbox_config:
   TIME_ZONE: "Australia/Brisbane"
+  PLUGINS_CONFIG:
+    netbox_ping:
+      default_timeout: 800
+      default_packet_size: 56
 
 netbox_allowed_hosts:
   - localhost
